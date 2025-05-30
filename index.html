@@ -4,7 +4,7 @@
   <body style="background:#111;color:#fff;text-align:center;padding-top:100px;font-family:sans-serif">
     <h1>✅ Autenticación completada</h1>
     <p>Puedes cerrar esta ventana</p>
-    <button style="padding:10px 20px;font-size:16px" onclick="Unity.call('close')">Cerrar</button>
+    <button style="padding:10px 20px;font-size:16px" onclick="window.location.href='unity:close'">Cerrar</button>
 
     <script>
       const params = new URLSearchParams(window.location.search);
@@ -12,13 +12,10 @@
       const error = params.get("error");
 
       if (code) {
-        setTimeout(() => {
-          Unity.call(code);
-        }, 500);
+        // Aquí no hace falta setTimeout si quieres inmediatismo
+        window.location.href = 'unity:' + code;
       } else if (error) {
-        setTimeout(() => {
-          Unity.call("error:" + error);
-        }, 500);
+        window.location.href = 'unity:error:' + error;
       } else {
         document.body.innerHTML = "<h1>❌ Error</h1><p>No se recibió código OAuth</p>";
       }
