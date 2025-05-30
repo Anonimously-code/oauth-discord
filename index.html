@@ -4,25 +4,24 @@
   <body style="background:#111;color:#fff;text-align:center;padding-top:100px;font-family:sans-serif">
     <h1>✅ Autenticación completada</h1>
     <p>Puedes cerrar esta ventana</p>
-    <button style="padding:10px 20px;font-size:16px" onclick="window.location.href='unity:close'">Cerrar</button>
+    <button style="padding:10px 20px;font-size:16px" onclick="Unity.call('close')">Cerrar</button>
 
     <script>
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get("code");
-  const error = params.get("error");
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get("code");
+      const error = params.get("error");
 
-  if (code) {
-    setTimeout(() => {
-      window.location.href = "unity:" + code;
-    }, 1000);
-  } else if (error) {
-    setTimeout(() => {
-      window.location.href = "unity:error:" + error;
-    }, 1000);
-  } else {
-    document.body.innerHTML = "<h1>❌ Error</h1><p>No se recibió código OAuth</p>";
-  }
-</script>
-
+      if (code) {
+        setTimeout(() => {
+          Unity.call(code);
+        }, 500);
+      } else if (error) {
+        setTimeout(() => {
+          Unity.call("error:" + error);
+        }, 500);
+      } else {
+        document.body.innerHTML = "<h1>❌ Error</h1><p>No se recibió código OAuth</p>";
+      }
+    </script>
   </body>
 </html>
