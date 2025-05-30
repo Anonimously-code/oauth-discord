@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head><title>Autenticación completada</title></head>
+  <body style="background:#111;color:#fff;text-align:center;padding-top:100px;font-family:sans-serif">
+    <h1>✅ Autenticación completada</h1>
+    <p>Puedes cerrar esta ventana</p>
+    <button style="padding:10px 20px;font-size:16px" onclick="window.location.href='unity:close'">Cerrar</button>
+
+    <script>
+      const code = new URLSearchParams(window.location.search).get("code");
+      if (code) {
+        setTimeout(() => {
+          window.location.href = "unity:" + code;
+        }, 1000); // pequeña espera opcional para ver el mensaje
+      } else {
+        document.body.innerHTML = "<h1>❌ Error</h1><p>No se recibió código OAuth</p>";
+      }
+    </script>
+  </body>
+</html>
