@@ -1,47 +1,63 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Login con Google</title>
+  <meta charset="UTF-8" />
+  <title>Login con Google (sin popup)</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/jwt-decode@4.0.0/build/jwt-decode.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
+    #output { white-space: pre-wrap; word-break: break-all; }
+  </style>
 </head>
 <body>
-  <h1>Login con Google</h1>
-
-  <!-- Botón de Google Sign-In -->
-  <div id="g_id_onload"
-       data-client_id="569265039972-tpllhdeddojvqh22j22cl9is8gvrp2h2.apps.googleusercontent.com"
-       data-ux_mode="redirect"
-       data-login_uri="https://anonimously-code.github.io/oauth-discord/"
-       data-auto_prompt="false">
-  </div>
-
-  <div class="g_id_signin"
-       data-type="standard"
-       data-shape="pill"
-       data-theme="outline"
-       data-text="signin_with"
-       data-size="large"
-       data-logo_alignment="left">
-  </div>
-
-  <pre id="output"></pre>
+  <h1>Login con Google (sin ventana emergente)</h1>
+  <div id="button"></div>
+  <pre id="output">Esperando inicio de sesión…</pre>
 
   <script>
-    // Procesar después de redirección
-    window.onload = () => {
-      const params = new URLSearchParams(window.location.search);
-      if (params.has("credential")) {
-        const token = params.get("credential");
-        const user = jwt_decode(token);
+    function handleCredentialResponse(response) {
+      const token = response.credential;       // ID Token (JWT)
+      const user = jwt_decode(token);          // Decodifica en el cliente
 
-        document.getElementById("output").textContent =
-          "ID Token:\n" + token + "\n\n" +
-          "Datos decodificados:\n" + JSON.stringify(user, null, 2);
-      }
+      document.getElementById("output").textContent =
+        "ID Token:\n" + token + "\n\n" +
+        "Datos decodificados:\n" + JSON.stringify(user, null, 2);
+
+      // Evita que vuelva a mostrar el prompt tras autenticarse
+      if (google?.accounts?.id) google.accounts.id.cancel();
+    }
+
+    window.onload = function () {
+      // Inicializa GIS
+      google.accounts.id.initialize({
+        client_id: "569265039972-tpllhdeddojvqh22j22cl9is8gvrp2h2.apps.googleusercontent.com",
+        callback: handleCredentialResponse,
+        auto_select: false,
+        itp_support: true,
+        use_fedcm_for_prompt: true
+      });
+
+      // (Opcional) Render de botón que NO abre popup, solo re-dispara prompt en la misma página
+      google.accounts.id.renderButton(
+        document.getElementById("button"),
+        { type: "standard", shape: "pill", theme: "outline", text: "signin_with", size: "large", logo_alignment: "left" }
+      );
+
+      // Muestra One Tap inline (misma página, sin popup)
+      google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed()) {
+          document.getElementById("output").textContent =
+            "No se pudo mostrar One Tap: " + notification.getNotDisplayedReason() +
+            "\n\nAsegúrate de tener 'https://anonimously-code.github.io' en Authorized JavaScript origins " +
+            "y de estar logueado en Google en este navegador.";
+        }
+        if (notification.isSkippedMoment()) {
+          // El usuario lo cerró o el navegador lo saltó; puedes volver a intentar cuando haga clic en el botón.
+          document.getElementById("output").textContent = "One Tap omitido. Haz clic en el botón para intentarlo de nuevo.";
+        }
+      });
     };
   </script>
 </body>
 </html>
-
