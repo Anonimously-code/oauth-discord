@@ -1,48 +1,28 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Login con Google (popup)</title>
-</head>
-<body>
-  <h1>Login con Google (popup)</h1>
-  <button onclick="loginGoogle()">Iniciar sesión</button>
+<html>
+  <head><title>Autenticación completada</title></head>
+  <body style="background:#111;color:#fff;text-align:center;padding-top:100px;font-family:sans-serif">
+    <h1>✅ Autenticación completada</h1>
+    <p>Puedes cerrar esta ventana</p>
+    <button style="padding:10px 20px;font-size:16px" onclick="window.location.href='unity:close'">Cerrar</button>
 
-  <pre id="output"></pre>
+    <script>
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const error = params.get("error");
 
-  <script>
-    const CLIENT_ID = "569265039972-tpllhdeddojvqh22j22cl9is8gvrp2h2.apps.googleusercontent.com";
-    const REDIRECT_URI = "https://anonimously-code.github.io/SequenceAuthV1/"; // tu redirect real
+  if (code) {
+    setTimeout(() => {
+      window.location.href = "unity:" + code;
+    }, 1000);
+  } else if (error) {
+    setTimeout(() => {
+      window.location.href = "unity:error:" + error;
+    }, 1000);
+  } else {
+    document.body.innerHTML = "<h1>❌ Error</h1><p>No se recibió código OAuth</p>";
+  }
+</script>
 
-    function loginGoogle() {
-      const url =
-        "https://accounts.google.com/o/oauth2/v2/auth" +
-        "?client_id=" + CLIENT_ID +
-        "&redirect_uri=" + encodeURIComponent(REDIRECT_URI) +
-        "&response_type=token" +           // devuelve directamente access_token en el hash
-        "&scope=openid%20email%20profile" +
-        "&prompt=select_account";
-
-      const w = 500, h = 600;
-      const left = (screen.width - w) / 2;
-      const top = (screen.height - h) / 2;
-
-      const popup = window.open(
-        url,
-        "googleLogin",
-        `width=${w},height=${h},top=${top},left=${left}`
-      );
-
-      // Escuchar mensajes desde el popup
-      window.addEventListener("message", (event) => {
-        if (event.origin !== window.location.origin) return;
-        if (event.data.type === "google_token") {
-          document.getElementById("output").textContent =
-            "Access Token:\n" + event.data.token;
-        }
-      });
-    }
-  </script>
-</body>
+  </body>
 </html>
-
