@@ -1,63 +1,28 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Login con Google (sin popup)</title>
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@4.0.0/build/jwt-decode.min.js"></script>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 40px auto; padding: 0 16px; }
-    #output { white-space: pre-wrap; word-break: break-all; }
-  </style>
-</head>
-<body>
-  <h1>Login con Google (sin ventana emergente)</h1>
-  <div id="button"></div>
-  <pre id="output">Esperando inicio de sesión…</pre>
+<html>
+  <head><title>Autenticación completada</title></head>
+  <body style="background:#111;color:#fff;text-align:center;padding-top:100px;font-family:sans-serif">
+    <h1>✅ Autenticación completada</h1>
+    <p>Puedes cerrar esta ventana</p>
+    <button style="padding:10px 20px;font-size:16px" onclick="window.location.href='unity:close'">Cerrar</button>
 
-  <script>
-    function handleCredentialResponse(response) {
-      const token = response.credential;       // ID Token (JWT)
-      const user = jwt_decode(token);          // Decodifica en el cliente
+    <script>
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const error = params.get("error");
 
-      document.getElementById("output").textContent =
-        "ID Token:\n" + token + "\n\n" +
-        "Datos decodificados:\n" + JSON.stringify(user, null, 2);
+  if (code) {
+    setTimeout(() => {
+      window.location.href = "unity:" + code;
+    }, 1000);
+  } else if (error) {
+    setTimeout(() => {
+      window.location.href = "unity:error:" + error;
+    }, 1000);
+  } else {
+    document.body.innerHTML = "<h1>❌ Error</h1><p>No se recibió código OAuth</p>";
+  }
+</script>
 
-      // Evita que vuelva a mostrar el prompt tras autenticarse
-      if (google?.accounts?.id) google.accounts.id.cancel();
-    }
-
-    window.onload = function () {
-      // Inicializa GIS
-      google.accounts.id.initialize({
-        client_id: "569265039972-tpllhdeddojvqh22j22cl9is8gvrp2h2.apps.googleusercontent.com",
-        callback: handleCredentialResponse,
-        auto_select: false,
-        itp_support: true,
-        use_fedcm_for_prompt: true
-      });
-
-      // (Opcional) Render de botón que NO abre popup, solo re-dispara prompt en la misma página
-      google.accounts.id.renderButton(
-        document.getElementById("button"),
-        { type: "standard", shape: "pill", theme: "outline", text: "signin_with", size: "large", logo_alignment: "left" }
-      );
-
-      // Muestra One Tap inline (misma página, sin popup)
-      google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed()) {
-          document.getElementById("output").textContent =
-            "No se pudo mostrar One Tap: " + notification.getNotDisplayedReason() +
-            "\n\nAsegúrate de tener 'https://anonimously-code.github.io' en Authorized JavaScript origins " +
-            "y de estar logueado en Google en este navegador.";
-        }
-        if (notification.isSkippedMoment()) {
-          // El usuario lo cerró o el navegador lo saltó; puedes volver a intentar cuando haga clic en el botón.
-          document.getElementById("output").textContent = "One Tap omitido. Haz clic en el botón para intentarlo de nuevo.";
-        }
-      });
-    };
-  </script>
-</body>
+  </body>
 </html>
