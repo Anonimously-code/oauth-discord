@@ -2,26 +2,50 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Resultado Login</title>
+  <title>Login con Google</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-  <h2>Procesando login...</h2>
-  <pre id="output"></pre>
+  <h2>Login con Google</h2>
+
+  <!-- Configuración de Google Sign-In -->
+  <div id="g_id_onload"
+       data-client_id="569265039972-tpllhdeddojvqh22j22cl9is8gvrp2h2.apps.googleusercontent.com"
+       data-context="signin"
+       data-ux_mode="redirect"
+       data-login_uri=""
+       data-auto_prompt="false">
+  </div>
+
+  <!-- Botón de login -->
+  <div class="g_id_signin"
+       data-type="standard"
+       data-shape="pill"
+       data-theme="outline"
+       data-text="signin_with"
+       data-size="large"
+       data-logo_alignment="left">
+  </div>
+
+  <pre id="result"></pre>
 
   <script>
-    // Leer parámetros de la URL
-    const params = new URLSearchParams(window.location.search);
-
-    if (params.has("credential")) {
-      document.getElementById("output").textContent =
-        "Token JWT:\n" + params.get("credential");
-    } else if (params.has("code")) {
-      document.getElementById("output").textContent =
-        "Código de autorización:\n" + params.get("code");
-    } else {
-      document.getElementById("output").textContent =
-        "No se recibió ningún token/código.";
+    // Cuando Google nos redirige de vuelta, trae los datos en la URL
+    function getFragmentParam(param) {
+      const urlParams = new URLSearchParams(window.location.hash.substring(1));
+      return urlParams.get(param);
     }
+
+    window.onload = () => {
+      // Si Google nos devolvió un "credential"
+      const id_token = getFragmentParam("id_token");
+      if (id_token) {
+        document.getElementById("result").textContent = "Tu ID Token:\n\n" + id_token;
+      } else {
+        document.getElementById("result").textContent = "Haz login para obtener el token.";
+      }
+    };
   </script>
 </body>
 </html>
+
