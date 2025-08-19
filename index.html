@@ -6,18 +6,15 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-  <h2>Login con Google</h2>
+  <h1>Login con Google</h1>
 
-  <!-- Configuración de Google Sign-In -->
+  <!-- Botón de Google Sign-In -->
   <div id="g_id_onload"
        data-client_id="569265039972-tpllhdeddojvqh22j22cl9is8gvrp2h2.apps.googleusercontent.com"
-       data-context="signin"
-       data-ux_mode="redirect"
-       data-login_uri=""
+       data-callback="handleCredentialResponse"
        data-auto_prompt="false">
   </div>
 
-  <!-- Botón de login -->
   <div class="g_id_signin"
        data-type="standard"
        data-shape="pill"
@@ -27,25 +24,18 @@
        data-logo_alignment="left">
   </div>
 
-  <pre id="result"></pre>
+  <pre id="output"></pre>
 
   <script>
-    // Cuando Google nos redirige de vuelta, trae los datos en la URL
-    function getFragmentParam(param) {
-      const urlParams = new URLSearchParams(window.location.hash.substring(1));
-      return urlParams.get(param);
-    }
+    // Cuando Google devuelve el token
+    function handleCredentialResponse(response) {
+      // El JWT de Google viene en response.credential
+      const token = response.credential;
 
-    window.onload = () => {
-      // Si Google nos devolvió un "credential"
-      const id_token = getFragmentParam("id_token");
-      if (id_token) {
-        document.getElementById("result").textContent = "Tu ID Token:\n\n" + id_token;
-      } else {
-        document.getElementById("result").textContent = "Haz login para obtener el token.";
-      }
-    };
+      // Mostrarlo en pantalla (puedes guardarlo o enviarlo a tu backend)
+      document.getElementById("output").textContent =
+        "ID Token de Google:\n\n" + token;
+    }
   </script>
 </body>
 </html>
-
