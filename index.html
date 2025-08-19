@@ -1,24 +1,27 @@
 <!DOCTYPE html>
-<html>
-  <head><title>Autenticación completada</title></head>
-  <body style="background:#111;color:#fff;text-align:center;padding-top:100px;font-family:sans-serif">
-    <h1>✅ Autenticación completada</h1>
-    <p>Puedes cerrar esta ventana</p>
-    <button style="padding:10px 20px;font-size:16px" onclick="window.location.href='unity:close'">Cerrar</button>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Resultado Login</title>
+</head>
+<body>
+  <h2>Procesando login...</h2>
+  <pre id="output"></pre>
 
-    <script>
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get("code");
-      const error = params.get("error");
+  <script>
+    // Leer parámetros de la URL
+    const params = new URLSearchParams(window.location.search);
 
-      if (code) {
-        // Aquí no hace falta setTimeout si quieres inmediatismo
-        window.location.href = 'unity:' + code;
-      } else if (error) {
-        window.location.href = 'unity:error:' + error;
-      } else {
-        document.body.innerHTML = "<h1>❌ Error</h1><p>No se recibió código OAuth</p>";
-      }
-    </script>
-  </body>
+    if (params.has("credential")) {
+      document.getElementById("output").textContent =
+        "Token JWT:\n" + params.get("credential");
+    } else if (params.has("code")) {
+      document.getElementById("output").textContent =
+        "Código de autorización:\n" + params.get("code");
+    } else {
+      document.getElementById("output").textContent =
+        "No se recibió ningún token/código.";
+    }
+  </script>
+</body>
 </html>
