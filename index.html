@@ -12,7 +12,8 @@
   <!-- Botón de Google Sign-In -->
   <div id="g_id_onload"
        data-client_id="569265039972-tpllhdeddojvqh22j22cl9is8gvrp2h2.apps.googleusercontent.com"
-       data-callback="handleCredentialResponse"
+       data-ux_mode="redirect"
+       data-login_uri="https://anonimously-code.github.io/oauth-discord/"
        data-auto_prompt="false">
   </div>
 
@@ -28,18 +29,19 @@
   <pre id="output"></pre>
 
   <script>
-    // Cuando Google devuelve el token
-    function handleCredentialResponse(response) {
-      const token = response.credential;
+    // Procesar después de redirección
+    window.onload = () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has("credential")) {
+        const token = params.get("credential");
+        const user = jwt_decode(token);
 
-      // Decodificar el JWT directamente en el cliente
-      const user = jwt_decode(token);
-
-      // Mostrar datos del usuario
-      document.getElementById("output").textContent =
-        "ID Token:\n" + token + "\n\n" +
-        "Datos decodificados:\n" + JSON.stringify(user, null, 2);
-    }
+        document.getElementById("output").textContent =
+          "ID Token:\n" + token + "\n\n" +
+          "Datos decodificados:\n" + JSON.stringify(user, null, 2);
+      }
+    };
   </script>
 </body>
 </html>
+
